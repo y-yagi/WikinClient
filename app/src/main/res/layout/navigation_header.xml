@@ -5,5 +5,7 @@
     android:layout_height="wrap_content"
     android:text="@string/recently_update"
     android:layout_gravity="center_vertical"
+    android:textSize="18dp"
+    android:textAlignment="gravity"
      />
 

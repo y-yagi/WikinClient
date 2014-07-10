@@ -101,7 +101,7 @@ public class NavigationDrawerFragment extends Fragment {
             }
         });
         TextView headerView = (TextView)inflater.inflate(R.layout.navigation_header, container);
-        mDrawerListView.addHeaderView(headerView);
+        mDrawerListView.addHeaderView(headerView, null, false);
         mDrawerListView.setAdapter(new ArrayAdapter<String>(
                 getActionBar().getThemedContext(),
                 android.R.layout.simple_list_item_activated_1,
