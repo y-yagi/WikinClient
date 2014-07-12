@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources> 
    <color name="main_color">#9e9950</color>
+   <color name="list_selected">#9e9950</color>
+   <color name="list_default">#cccc</color>
+
 </resources>
