@@ -65,6 +65,7 @@ public class WikinClient {
         JSONArray pages = response.getJSONArray("pages");
         this.mPageCount = response.getInt("results_returned");
         this.mMenu = new String[mPageCount];
+        this.mPages.clear();
 
         for(int i = 0; i < mPageCount; i++) {
             Page page = new Page(

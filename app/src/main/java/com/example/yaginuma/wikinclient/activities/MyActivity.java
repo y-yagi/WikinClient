@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -20,6 +21,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.webkit.WebView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -80,7 +82,6 @@ public class MyActivity extends Activity
         mBodyHtml = (WebView) findViewById(R.id.bodyHtml);
 
         this.mWikinClient = new WikinClient(this);
-//        fetchPageListFromWikin();
 
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(
@@ -99,7 +100,7 @@ public class MyActivity extends Activity
     }
 
     public void onSectionAttached(int number) {
-        String body = "Now Loading...";
+        String body = "";
         if (mEventCount > 0 ) {
             body = mWikinClient.getPages().get(number - 2).getExtractedBody();
             mCurrentPos = number - 2;
@@ -196,6 +197,7 @@ public class MyActivity extends Activity
     private void fetchPageListFromWikin() {
         String body = "Now Loading...";
         mBodyHtml.loadDataWithBaseURL(null, body, "text/html", "utf-8", null);
+        final Context mContext = this;
 
         RequestQueue mQueue;
         mQueue = Volley.newRequestQueue(this);
@@ -213,6 +215,7 @@ public class MyActivity extends Activity
                                 mEventCount = mWikinClient.getPageCount();
                             }
                         } catch (JSONException e) {
+                            Toast.makeText(mContext, mContext.getString(R.string.error_unknown_exception), Toast.LENGTH_SHORT).show();
                             Log.e(TAG, "Data parse error");
                             e.printStackTrace();
                         }
@@ -220,6 +223,7 @@ public class MyActivity extends Activity
                 },
                 new Response.ErrorListener() {
                     public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(mContext, mContext.getString(R.string.error_unknown_exception), Toast.LENGTH_SHORT).show();
                         Log.e(TAG, "Data load error");
                         error.printStackTrace();
                     }
