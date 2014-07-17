@@ -51,6 +51,7 @@
                     android:imeOptions="actionUnspecified"
                     android:inputType="textMultiLine"
                     android:lines="10"
+                    android:gravity="left"
                     />
 
                 <Button
