@@ -11,8 +11,12 @@
     <string name="action_settings">Settings</string>
     <string name="action_edit">Edit</string>
     <string name="action_new">New</string>
+    <string name="action_search">Search</string>
     <string name="action_reload">Reload</string>
     <string name="loading">Now loading...</string>
     <string name="recently_update">最近更新されたページ</string>
-
+    <string name="error_unknown_exception">予期せぬエラーが発生しました。再度処理を行って下さい。</string>
+    <string name="error_input">入力内容に誤りがあります。</string>
+    <string name="error_field_required">値を入力して下さい。</string>
+    <string name="success_update">更新処理が完了しました</string>
 </resources>

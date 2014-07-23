@@ -12,9 +12,17 @@
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.SEARCH" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
         </activity>
         <activity
             android:name=".activities.SettingsActivity"
@@ -24,6 +32,16 @@
             android:name=".activities.EditActivity"
             android:label="@string/title_activity_edit"
             android:windowSoftInputMode="adjustResize|stateVisible" >
+        </activity>
+
+        <provider
+            android:name=".providers.WikinClientSuggestionProvider"
+            android:authorities="wikinclient"
+            android:syncable="false" />
+
+        <activity
+            android:name=".activities.ListActivity"
+            android:label="@string/title_activity_list" >
         </activity>
     </application>
 

@@ -3,12 +3,16 @@ package com.example.yaginuma.wikinclient.activities;
 import android.app.Activity;
 
 import android.app.ActionBar;
+import android.app.DownloadManager;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.SearchManager;
+import android.app.SearchableInfo;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.SearchRecentSuggestions;
 import android.text.Html;
 import android.util.Base64;
 import android.util.Log;
@@ -20,6 +24,7 @@ import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
 import android.webkit.WebView;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +39,7 @@ import com.example.yaginuma.wikinclient.api.WikinClient;
 import com.example.yaginuma.wikinclient.fragments.NavigationDrawerFragment;
 import com.example.yaginuma.wikinclient.R;
 import com.example.yaginuma.wikinclient.model.Page;
+import com.example.yaginuma.wikinclient.providers.WikinClientSuggestionProvider;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,7 +58,7 @@ import java.util.Map;
 
 
 public class MyActivity extends Activity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks, Response.Listener<JSONObject>, Response.ErrorListener {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -74,7 +80,6 @@ public class MyActivity extends Activity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my);
-
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -117,11 +122,30 @@ public class MyActivity extends Activity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (!mNavigationDrawerFragment.isDrawerOpen()) {
-            // Only show items in the action bar relevant to this screen
-            // if the drawer is not showing. Otherwise, let the drawer
-            // decide what to show in the action bar.
             getMenuInflater().inflate(R.menu.my, menu);
             restoreActionBar();
+
+            // 検索処理設定
+            SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+            SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+            SearchableInfo searchableInfo = searchManager.getSearchableInfo(getComponentName());
+            searchView.setSearchableInfo(searchableInfo);
+            final Context mContext = this;
+
+            final SearchView.OnQueryTextListener queryTextListener = new SearchView.OnQueryTextListener() {
+                public boolean onQueryTextChange(String newText) {
+                    return true;
+                }
+
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    Intent listIntent = new Intent(mContext, ListActivity.class);
+                    listIntent.putExtra("query", query);
+                    startActivity(listIntent);
+                    return true;
+                }
+            };
+            searchView.setOnQueryTextListener(queryTextListener);
             return true;
         }
         return super.onCreateOptionsMenu(menu);
@@ -129,11 +153,7 @@ public class MyActivity extends Activity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
         switch (id) {
             case R.id.action_settings:
                 Intent settingIntent = new Intent(this, SettingsActivity.class);
@@ -147,6 +167,9 @@ public class MyActivity extends Activity
                 Page page = mWikinClient.getPages().get(this.mCurrentPos);
                 editIntent.putExtra("page", page);
                 startActivity(editIntent);
+                return true;
+            case R.id.action_search:
+                Toast.makeText(this, "search", Toast.LENGTH_SHORT).show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -197,42 +220,15 @@ public class MyActivity extends Activity
     private void fetchPageListFromWikin() {
         String body = "Now Loading...";
         mBodyHtml.loadDataWithBaseURL(null, body, "text/html", "utf-8", null);
-        final Context mContext = this;
 
         RequestQueue mQueue;
         mQueue = Volley.newRequestQueue(this);
-        mQueue.add(new JsonObjectRequest(Request.Method.GET, mWikinClient.getListUrl(), null,
-                new Response.Listener<JSONObject>() {
-                    public void onResponse(JSONObject response) {
-                        try {
-                            mWikinClient.parseListResponse(response);
-                            mNavigationDrawerFragment.setMenuList(mWikinClient.getMenu());
-                            String body = "";
-                            if (mWikinClient.getPageCount() > 0 ) {
-                                Page page = mWikinClient.getPages().get(0);
-                                body = page.getExtractedBody();
-                                mBodyHtml.loadDataWithBaseURL(null, body, "text/html", "utf-8", null);
-                                mEventCount = mWikinClient.getPageCount();
-                            }
-                        } catch (JSONException e) {
-                            Toast.makeText(mContext, mContext.getString(R.string.error_unknown_exception), Toast.LENGTH_SHORT).show();
-                            Log.e(TAG, "Data parse error");
-                            e.printStackTrace();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(mContext, mContext.getString(R.string.error_unknown_exception), Toast.LENGTH_SHORT).show();
-                        Log.e(TAG, "Data load error");
-                        error.printStackTrace();
-                    }
-                }
-        )
-        {
+        mQueue.add(new JsonObjectRequest(Request.Method.GET, mWikinClient.getListUrl(),
+                null, this, this
+        ){
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                return mWikinClient.getHeaders(super.getHeaders());
+                return mWikinClient.addAuthHeaders(super.getHeaders());
             };
         });
     }
@@ -243,5 +239,30 @@ public class MyActivity extends Activity
         fetchPageListFromWikin();
     }
 
+    @Override
+    public void onResponse(JSONObject response) {
+        try {
+            mWikinClient.parseListResponse(response);
+            mNavigationDrawerFragment.setMenuList(mWikinClient.getMenu());
+            String body = "";
+            if (mWikinClient.getPageCount() > 0 ) {
+                Page page = mWikinClient.getPages().get(0);
+                body = page.getExtractedBody();
+                mBodyHtml.loadDataWithBaseURL(null, body, "text/html", "utf-8", null);
+                mEventCount = mWikinClient.getPageCount();
+            }
+        } catch (JSONException e) {
+            Toast.makeText(this, this.getString(R.string.error_unknown_exception), Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Data parse error");
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onErrorResponse(VolleyError error) {
+        Toast.makeText(this, this.getString(R.string.error_unknown_exception), Toast.LENGTH_SHORT).show();
+        Log.e(TAG, "Data load error");
+        error.printStackTrace();
+    }
 }
 
