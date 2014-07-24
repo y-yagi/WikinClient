@@ -4,6 +4,8 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.pdf.PdfDocument;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ListView;
@@ -134,26 +137,38 @@ public class ListActivity extends Activity
     @Override
     public void onResponse(JSONObject response) {
         PageListAdapter pageListAdapter = new PageListAdapter(this);
+        final Context context = this;
         showProgress(false);
         try {
             mWikinClient.parseListResponse(response);
-            mHeaderView.setText("「" + searchQuery + "」の検索結果");
-
-            if (mWikinClient.getPageCount() > 0 ) {
-                for (Page page : mWikinClient.getPages()) {
-                    pageListAdapter.add(page);
-                }
-
-                if (mListView!= null) {
-                    mListView.setAdapter(pageListAdapter);
-                } else if (mGridView != null) {
-                    mGridView.setAdapter(pageListAdapter);
-                 }
-            }
         } catch (JSONException e) {
             Toast.makeText(this, this.getString(R.string.error_unknown_exception), Toast.LENGTH_SHORT).show();
             Log.e(TAG, "Data parse error");
             e.printStackTrace();
+        }
+
+        mHeaderView.setText("「" + searchQuery + "」の検索結果");
+
+        if (mWikinClient.getPageCount() > 0 ) {
+            for (Page page : mWikinClient.getPages()) {
+                pageListAdapter.add(page);
+            }
+
+            if (mListView!= null) {
+                mListView.setAdapter(pageListAdapter);
+                mListView.setOnItemClickListener(new AdapterView.OnItemClickListener () {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view,
+                                            int position, long id) {
+                        Page page = (Page) mListView.getItemAtPosition(position);
+                        Intent showIntent = new Intent(context, ShowActivty.class);
+                        showIntent.putExtra("page", page);
+                        startActivity(showIntent);
+                    }
+                });
+            } else if (mGridView != null) {
+                mGridView.setAdapter(pageListAdapter);
+            }
         }
     }
 

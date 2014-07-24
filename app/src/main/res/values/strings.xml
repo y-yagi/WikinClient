@@ -19,4 +19,7 @@
     <string name="error_input">入力内容に誤りがあります。</string>
     <string name="error_field_required">値を入力して下さい。</string>
     <string name="success_update">更新処理が完了しました</string>
+    <string name="title_activity_show_activty">表示</string>
+    <string name="hello_world">Hello world!</string>
+
 </resources>
