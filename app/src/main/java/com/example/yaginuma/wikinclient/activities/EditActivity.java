@@ -73,7 +73,6 @@ public class EditActivity extends Activity
         Bundle extras = getIntent().getExtras();
         mPage = (Page) extras.getSerializable("page");
 
-        // Set up the login form.
         mTitleView = (TextView) findViewById(R.id.title);
         mTitleView.setText(mPage.getTitle());
         populateAutoComplete();

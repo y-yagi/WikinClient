@@ -43,6 +43,10 @@
             android:name=".activities.ListActivity"
             android:label="@string/title_activity_list" >
         </activity>
+        <activity
+            android:name=".activities.ShowActivty"
+            android:label="@string/title_activity_show_activty" >
+        </activity>
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
