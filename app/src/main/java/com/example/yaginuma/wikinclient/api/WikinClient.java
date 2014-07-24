@@ -39,6 +39,7 @@ public class WikinClient {
 
     private static final String LIST_PATH = "/pages.json?recent_pages=true";
     private static final String UPDATE_PATH = "/pages/";
+    private static final String SEARTH_PATH = "/search/index.json/?search=";
     private static final String TAG = WikinClient.class.getSimpleName();
 
     public WikinClient(Context context) {
@@ -54,26 +55,29 @@ public class WikinClient {
 
     public String getListUrl() {
         return this.mBaseUrl + LIST_PATH;
-    } 
+    }
 
     public String getUpdateUrl() {
         return this.mBaseUrl + UPDATE_PATH;
     }
 
+    public String getSearchUrl(String query) {
+        return this.mBaseUrl + SEARTH_PATH + query;
+    }
 
-    public void parseListResponse(JSONObject response) throws  JSONException {
+    public void parseListResponse(JSONObject response) throws JSONException {
         JSONArray pages = response.getJSONArray("pages");
         this.mPageCount = response.getInt("results_returned");
         this.mMenu = new String[mPageCount];
         this.mPages.clear();
 
-        for(int i = 0; i < mPageCount; i++) {
+        for (int i = 0; i < mPageCount; i++) {
             Page page = new Page(
-              pages.getJSONObject(i).getInt("id"),
-              pages.getJSONObject(i).getString("title"),
-              pages.getJSONObject(i).getString("body"),
-              pages.getJSONObject(i).getString("extracted_body"),
-              pages.getJSONObject(i).getString("url")
+                    pages.getJSONObject(i).getInt("id"),
+                    pages.getJSONObject(i).getString("title"),
+                    pages.getJSONObject(i).getString("body"),
+                    pages.getJSONObject(i).getString("extracted_body"),
+                    pages.getJSONObject(i).getString("url")
             );
             mPages.add(page);
             mMenu[i] = page.getTitle();
@@ -93,14 +97,14 @@ public class WikinClient {
         return this.mPageCount;
     }
 
-    public Map<String, String> getHeaders(Map<String, String> oldHeaders) {
-      Map<String, String> newHeaders = new HashMap<String, String>();
-      newHeaders.putAll(oldHeaders);
-      newHeaders.put("Authorization", "Basic " + mEncodedAuth);
-      return newHeaders;
+    public Map<String, String> addAuthHeaders(Map<String, String> oldHeaders) {
+        Map<String, String> newHeaders = new HashMap<String, String>();
+        newHeaders.putAll(oldHeaders);
+        newHeaders.put("Authorization", "Basic " + mEncodedAuth);
+        return newHeaders;
     }
 
-    public boolean verificationResponse(JSONObject response) throws  JSONException {
+    public boolean verificationResponse(JSONObject response) throws JSONException {
         String result = response.getString("status");
         if (result.equals("ok")) {
             return true;
@@ -109,3 +113,5 @@ public class WikinClient {
         }
     }
 }
+
+

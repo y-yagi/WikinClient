@@ -2,10 +2,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MyActivity" >
     <item
-        android:id="@+id/action_new"
-        android:icon="@drawable/ic_action_new"
+        android:id="@+id/action_search"
+        android:icon="@drawable/abc_ic_search"
         android:showAsAction="ifRoom"
-        android:title="@string/action_new"/>
+        android:actionViewClass="android.widget.SearchView"
+        android:title="@string/action_search"/>
     <item
         android:id="@+id/action_edit"
         android:icon="@drawable/ic_action_edit"

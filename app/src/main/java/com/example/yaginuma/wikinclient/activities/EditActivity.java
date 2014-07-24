@@ -48,7 +48,8 @@ import java.util.Map;
 /**
  * A login screen that offers login via email/password.
  */
-public class EditActivity extends Activity implements LoaderCallbacks<Cursor> {
+public class EditActivity extends Activity
+        implements LoaderCallbacks<Cursor>, Response.Listener<JSONObject>, Response.ErrorListener {
 
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
@@ -135,13 +136,10 @@ public class EditActivity extends Activity implements LoaderCallbacks<Cursor> {
 
 
     /**
-     * Shows the progress UI and hides the login form.
+     * Shows the progress UI
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     public void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
@@ -163,8 +161,6 @@ public class EditActivity extends Activity implements LoaderCallbacks<Cursor> {
                 }
             });
         } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
             mEditFormView.setVisibility(show ? View.GONE : View.VISIBLE);
         }
@@ -207,7 +203,6 @@ public class EditActivity extends Activity implements LoaderCallbacks<Cursor> {
         int IS_PRIMARY = 1;
     }
 
-
     private void updatePage(String body) {
         Map<String, String> jsonParams = new HashMap<String, String>();
         jsonParams.put("body", body);
@@ -217,42 +212,39 @@ public class EditActivity extends Activity implements LoaderCallbacks<Cursor> {
         RequestQueue mQueue;
         mQueue = Volley.newRequestQueue(this);
         JsonObjectRequest myRequest = new JsonObjectRequest(
-                Request.Method.PUT, url, new JSONObject(jsonParams),
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        showProgress(false);
-                        boolean result = true;
-                        try {
-                            result = mWikinClient.verificationResponse(response);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            Log.e(TAG, "Data parse error");
-                        }
-                        if (result) {
-                            Toast.makeText(mContext, mContext.getString(R.string.success_update), Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(mContext, mContext.getString(R.string.error_input), Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(mContext, mContext.getString(R.string.error_unknown_exception), Toast.LENGTH_SHORT).show();
-                        showProgress(false);
-                    }
-                }
+                Request.Method.PUT, url, new JSONObject(jsonParams), this, this
         ) {
-
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = mWikinClient.getHeaders(super.getHeaders());
+                Map<String, String> headers = mWikinClient.addAuthHeaders(super.getHeaders());
                 headers.put("Content-Type", "application/json; charset=utf-8");
                 return headers;
             }
         };
         mQueue.add(myRequest);
+    }
+
+    @Override
+    public void onResponse(JSONObject response) {
+        showProgress(false);
+        boolean result = true;
+        try {
+            result = mWikinClient.verificationResponse(response);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.e(TAG, "Data parse error");
+        }
+        if (result) {
+            Toast.makeText(this, getString(R.string.success_update), Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, getString(R.string.error_input), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onErrorResponse(VolleyError error) {
+        Toast.makeText(this, getString(R.string.error_unknown_exception), Toast.LENGTH_SHORT).show();
+        showProgress(false);
     }
 }
 

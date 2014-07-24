@@ -11,7 +11,6 @@
     tools:context="com.example.yaginuma.wikinclient.activities.EditActivity"
     android:id="@+id/edit">
 
-    <!-- Login progress -->
     <ProgressBar
         android:id="@+id/edit_progress"
         style="?android:attr/progressBarStyleLarge"
