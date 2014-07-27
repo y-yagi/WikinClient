@@ -168,9 +168,6 @@ public class MyActivity extends Activity
                 editIntent.putExtra("page", page);
                 startActivity(editIntent);
                 return true;
-            case R.id.action_search:
-                Toast.makeText(this, "search", Toast.LENGTH_SHORT).show();
-                return true;
             default:
                 return super.onOptionsItemSelected(item);
 

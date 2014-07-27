@@ -4,6 +4,8 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.SearchManager;
+import android.app.SearchableInfo;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.pdf.PdfDocument;
@@ -17,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,7 +41,7 @@ import org.json.JSONObject;
 import java.util.Map;
 
 public class ListActivity extends Activity
-    implements  Response.Listener<JSONObject>, Response.ErrorListener {
+        implements Response.Listener<JSONObject>, Response.ErrorListener {
 
     private ListView mListView;
     private GridView mGridView;
@@ -74,6 +77,29 @@ public class ListActivity extends Activity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.list, menu);
+
+        // 検索処理設定
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        SearchableInfo searchableInfo = searchManager.getSearchableInfo(getComponentName());
+        searchView.setSearchableInfo(searchableInfo);
+        final Context mContext = this;
+
+        final SearchView.OnQueryTextListener queryTextListener = new SearchView.OnQueryTextListener() {
+            public boolean onQueryTextChange(String newText) {
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchQuery = query;
+                showProgress(true);
+                searchFromWikin();
+                return true;
+            }
+        };
+        searchView.setOnQueryTextListener(queryTextListener);
+
         return true;
     }
 
@@ -83,9 +109,6 @@ public class ListActivity extends Activity
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -125,7 +148,7 @@ public class ListActivity extends Activity
         mQueue = Volley.newRequestQueue(this);
         mQueue.add(new JsonObjectRequest(Request.Method.GET, mWikinClient.getSearchUrl(searchQuery),
                 null, this, this
-        ){
+        ) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 return mWikinClient.addAuthHeaders(super.getHeaders());
@@ -137,6 +160,8 @@ public class ListActivity extends Activity
     @Override
     public void onResponse(JSONObject response) {
         PageListAdapter pageListAdapter = new PageListAdapter(this);
+        pageListAdapter.clear();
+
         final Context context = this;
         showProgress(false);
         try {
@@ -149,26 +174,26 @@ public class ListActivity extends Activity
 
         mHeaderView.setText("「" + searchQuery + "」の検索結果");
 
-        if (mWikinClient.getPageCount() > 0 ) {
+        if (mWikinClient.getPageCount() > 0) {
             for (Page page : mWikinClient.getPages()) {
                 pageListAdapter.add(page);
             }
+        }
 
-            if (mListView!= null) {
-                mListView.setAdapter(pageListAdapter);
-                mListView.setOnItemClickListener(new AdapterView.OnItemClickListener () {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view,
-                                            int position, long id) {
-                        Page page = (Page) mListView.getItemAtPosition(position);
-                        Intent showIntent = new Intent(context, ShowActivty.class);
-                        showIntent.putExtra("page", page);
-                        startActivity(showIntent);
-                    }
-                });
-            } else if (mGridView != null) {
-                mGridView.setAdapter(pageListAdapter);
-            }
+        if (mListView != null) {
+            mListView.setAdapter(pageListAdapter);
+            mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view,
+                                        int position, long id) {
+                    Page page = (Page) mListView.getItemAtPosition(position);
+                    Intent showIntent = new Intent(context, ShowActivty.class);
+                    showIntent.putExtra("page", page);
+                    startActivity(showIntent);
+                }
+            });
+        } else if (mGridView != null) {
+            mGridView.setAdapter(pageListAdapter);
         }
     }
 
