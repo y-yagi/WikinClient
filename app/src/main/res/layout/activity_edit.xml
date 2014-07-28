@@ -19,12 +19,6 @@
         android:layout_marginBottom="8dp"
         android:visibility="gone"/>
 
-    <ScrollView
-        android:id="@+id/edit_form"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
-
             <LinearLayout
                 android:id="@+id/edit_form_layout"
                 android:layout_width="match_parent"
@@ -38,7 +32,15 @@
                     android:hint="@string/prompt_title"
                     android:maxLines="1"
                     android:textSize="30dp"
+                    android:paddingBottom="15dp"
                     android:singleLine="true"/>
+
+                <ScrollView
+                    android:id="@+id/edit_form"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    >
+
 
                 <EditText
                     android:id="@+id/body"
@@ -52,6 +54,7 @@
                     android:lines="10"
                     android:gravity="left"
                     />
+                </ScrollView>
 
                 <Button
                     android:id="@+id/update_button"
@@ -63,7 +66,6 @@
                     android:textStyle="bold"/>
 
             </LinearLayout>
-    </ScrollView>
 
 </LinearLayout>
 
