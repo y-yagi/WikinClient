@@ -41,7 +41,7 @@ public class WikinClient {
 
     private static final String LIST_PATH = "/pages.json?recent_pages=true";
     private static final String UPDATE_PATH = "/pages/";
-    private static final String SEARTH_PATH = "/search/index.json/?search=";
+    private static final String SEARTH_PATH = "/pages/search.json?query=";
     private static final String TAG = WikinClient.class.getSimpleName();
 
     public WikinClient(Context context) {
