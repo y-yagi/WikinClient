@@ -20,6 +20,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -62,7 +64,13 @@ public class WikinClient {
     }
 
     public String getSearchUrl(String query) {
-        return this.mBaseUrl + SEARTH_PATH + query;
+        String encodedQuery = "";
+        try {
+            encodedQuery = URLEncoder.encode(query, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return this.mBaseUrl + SEARTH_PATH + encodedQuery;
     }
 
     public void parseListResponse(JSONObject response) throws JSONException {
