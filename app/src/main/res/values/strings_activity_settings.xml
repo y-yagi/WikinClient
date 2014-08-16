@@ -1,5 +1,5 @@
 <resources>
-        <string name="title_activity_settings">Settings</string>
+        <string name="title_activity_settings">設定</string>
 
     <!-- Strings related to Settings -->
 
@@ -29,9 +29,9 @@
     <string name="pref_wikin_url">wikin_url</string>
     <string name="pref_wikin_url_display">Wikin URL</string>
     <string name="pref_wikin_auth_user_name">wikin_user_name</string>
-    <string name="pref_wikin_auth_user_name_display">Wikin ユーザ名</string>
+    <string name="pref_wikin_auth_user_name_display">Basic認証 ユーザ名</string>
     <string name="pref_wikin_auth_password">wikin_password</string>
-    <string name="pref_wikin_auth_password_display">Wikin パスワード</string>
+    <string name="pref_wikin_auth_password_display">Basic認証 パスワード</string>
 
 
     <!-- Example settings for Data & Sync -->

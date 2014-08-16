@@ -9,6 +9,7 @@
         android:capitalize="words"
         android:singleLine="true"
         android:defaultValue="http://"
+        android:hint="http://"
         android:maxLines="1" />
     <EditTextPreference
         android:key="@string/pref_wikin_auth_user_name"

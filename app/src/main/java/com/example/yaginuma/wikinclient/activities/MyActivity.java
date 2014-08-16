@@ -88,6 +88,12 @@ public class MyActivity extends Activity
 
         this.mWikinClient = new WikinClient(this);
 
+        if (this.mWikinClient.getBaseUrl().length() == 0) {
+            Intent settingIntent = new Intent(this, SettingsActivity.class);
+            startActivity(settingIntent);
+            return ;
+        }
+
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
@@ -218,6 +224,12 @@ public class MyActivity extends Activity
         String body = "Now Loading...";
         mBodyHtml.loadDataWithBaseURL(null, body, "text/html", "utf-8", null);
 
+        if (mWikinClient.getBaseUrl().length() == 0)  {
+            String errMsg = getString(R.string.setting_not_completed);
+            Toast.makeText(this, errMsg, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         RequestQueue mQueue;
         mQueue = Volley.newRequestQueue(this);
         mQueue.add(new JsonObjectRequest(Request.Method.GET, mWikinClient.getListUrl(),
@@ -257,7 +269,7 @@ public class MyActivity extends Activity
 
     @Override
     public void onErrorResponse(VolleyError error) {
-        Toast.makeText(this, this.getString(R.string.error_unknown_exception), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, this.getString(R.string.error_loading), Toast.LENGTH_SHORT).show();
         Log.e(TAG, "Data load error");
         error.printStackTrace();
     }

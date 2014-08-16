@@ -55,6 +55,8 @@ public class WikinClient {
         this.mPages = new ArrayList<Page>();
     }
 
+    public String getBaseUrl() { return this.mBaseUrl; }
+
     public String getListUrl() {
         return this.mBaseUrl + LIST_PATH;
     }
