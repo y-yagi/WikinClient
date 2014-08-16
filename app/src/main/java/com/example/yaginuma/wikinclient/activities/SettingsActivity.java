@@ -2,6 +2,7 @@ package com.example.yaginuma.wikinclient.activities;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -16,6 +17,8 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.text.TextUtils;
+import android.widget.Toast;
+
 import com.example.yaginuma.wikinclient.R;
 
 import java.util.List;
@@ -46,6 +49,13 @@ public class SettingsActivity extends PreferenceActivity {
         super.onPostCreate(savedInstanceState);
 
         setupSimplePreferencesScreen();
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String mBaseUrl = sharedPreferences.getString(getString(R.string.pref_wikin_url), "");
+        if (mBaseUrl.length() == 0) {
+            String errMsg = getString(R.string.hint_url);
+            Toast.makeText(this, errMsg, Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**

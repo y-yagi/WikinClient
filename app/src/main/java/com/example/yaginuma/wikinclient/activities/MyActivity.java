@@ -29,9 +29,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
@@ -87,6 +89,12 @@ public class MyActivity extends Activity
         mBodyHtml = (WebView) findViewById(R.id.bodyHtml);
 
         this.mWikinClient = new WikinClient(this);
+
+        if (this.mWikinClient.getBaseUrl().length() == 0) {
+            Intent settingIntent = new Intent(this, SettingsActivity.class);
+            startActivity(settingIntent);
+            return ;
+        }
 
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(
@@ -218,16 +226,26 @@ public class MyActivity extends Activity
         String body = "Now Loading...";
         mBodyHtml.loadDataWithBaseURL(null, body, "text/html", "utf-8", null);
 
+        if (mWikinClient.getBaseUrl().length() == 0)  {
+            String errMsg = getString(R.string.setting_not_completed);
+            Toast.makeText(this, errMsg, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         RequestQueue mQueue;
         mQueue = Volley.newRequestQueue(this);
-        mQueue.add(new JsonObjectRequest(Request.Method.GET, mWikinClient.getListUrl(),
+        JsonObjectRequest request =  new JsonObjectRequest(Request.Method.GET, mWikinClient.getListUrl(),
                 null, this, this
         ){
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 return mWikinClient.addAuthHeaders(super.getHeaders());
             };
-        });
+        };
+        RetryPolicy policy = new DefaultRetryPolicy(WikinClient.TIMEOUT,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        request.setRetryPolicy(policy);
+        mQueue.add(request);
     }
 
     @Override
@@ -257,7 +275,7 @@ public class MyActivity extends Activity
 
     @Override
     public void onErrorResponse(VolleyError error) {
-        Toast.makeText(this, this.getString(R.string.error_unknown_exception), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, this.getString(R.string.error_loading), Toast.LENGTH_SHORT).show();
         Log.e(TAG, "Data load error");
         error.printStackTrace();
     }
