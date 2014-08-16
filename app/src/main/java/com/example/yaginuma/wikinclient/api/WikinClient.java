@@ -43,6 +43,7 @@ public class WikinClient {
     private static final String UPDATE_PATH = "/pages/";
     private static final String SEARTH_PATH = "/pages/search.json?query=";
     private static final String TAG = WikinClient.class.getSimpleName();
+    public static  final int TIMEOUT = 5000;  //5 seconds
 
     public WikinClient(Context context) {
         this.mContext = context;

@@ -29,9 +29,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
@@ -232,14 +234,18 @@ public class MyActivity extends Activity
 
         RequestQueue mQueue;
         mQueue = Volley.newRequestQueue(this);
-        mQueue.add(new JsonObjectRequest(Request.Method.GET, mWikinClient.getListUrl(),
+        JsonObjectRequest request =  new JsonObjectRequest(Request.Method.GET, mWikinClient.getListUrl(),
                 null, this, this
         ){
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 return mWikinClient.addAuthHeaders(super.getHeaders());
             };
-        });
+        };
+        RetryPolicy policy = new DefaultRetryPolicy(WikinClient.TIMEOUT,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        request.setRetryPolicy(policy);
+        mQueue.add(request);
     }
 
     @Override
