@@ -251,6 +251,7 @@ public class MyActivity extends Activity
     @Override
     protected void onResume() {
         super.onResume();
+        this.mCurrentPos = 0;
         fetchPageListFromWikin();
     }
 
