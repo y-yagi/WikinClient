@@ -113,10 +113,13 @@ public class MyActivity extends Activity
     }
 
     public void onSectionAttached(int number) {
-        String body = "";
+        String body = "" ;
+        Page page;
         if (mEventCount > 0 ) {
-            body = mWikinClient.getPages().get(number - 2).getExtractedBody();
+            page = mWikinClient.getPages().get(number - 2);
+            body = page.getExtractedBody();
             mCurrentPos = number - 2;
+            mTitle = page.getTitle();
         }
         mBodyHtml.loadDataWithBaseURL(null, body, "text/html", "utf-8", null);
     }
@@ -263,6 +266,8 @@ public class MyActivity extends Activity
             String body = "";
             if (mWikinClient.getPageCount() > 0 ) {
                 Page page = mWikinClient.getPages().get(0);
+                mTitle = page.getTitle();
+                setTitle(page.getTitle());
                 body = page.getExtractedBody();
                 mBodyHtml.loadDataWithBaseURL(null, body, "text/html", "utf-8", null);
                 mEventCount = mWikinClient.getPageCount();
