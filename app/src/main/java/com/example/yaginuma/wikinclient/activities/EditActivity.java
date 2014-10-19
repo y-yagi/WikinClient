@@ -79,6 +79,7 @@ public class EditActivity extends Activity
 
         mBodyView = (EditText) findViewById(R.id.body);
         mBodyView.setText(mPage.getBody());
+        mBodyView.setSelection(mBodyView.getText().length());
         Button mEmailSignInButton = (Button) findViewById(R.id.update_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
