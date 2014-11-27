@@ -49,11 +49,7 @@ import java.util.Map;
  * A login screen that offers login via email/password.
  */
 public class EditActivity extends Activity
-        implements LoaderCallbacks<Cursor>, Response.Listener<JSONObject>, Response.ErrorListener {
-
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
+        implements Response.Listener<JSONObject>, Response.ErrorListener {
 
     // UI references.
     private TextView mTitleView;
@@ -75,7 +71,6 @@ public class EditActivity extends Activity
 
         mTitleView = (TextView) findViewById(R.id.title);
         mTitleView.setText(mPage.getTitle());
-        populateAutoComplete();
 
         mBodyView = (EditText) findViewById(R.id.body);
         mBodyView.setText(mPage.getBody());
@@ -91,18 +86,6 @@ public class EditActivity extends Activity
         mEditFormView = findViewById(R.id.edit_form);
         mProgressView = findViewById(R.id.edit_progress);
         mWikinClient = new WikinClient(this);
-    }
-
-    private void populateAutoComplete() {
-        getLoaderManager().initLoader(0, null, this);
-    }
-
-    private boolean isEmailValid(String email) {
-        return true;
-    }
-
-    private boolean isPasswordValid(String password) {
-        return true;
     }
 
     public void attemptUpdate() {
@@ -164,43 +147,6 @@ public class EditActivity extends Activity
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
             mEditFormView.setVisibility(show ? View.GONE : View.VISIBLE);
         }
-    }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new CursorLoader(this,
-                // Retrieve data rows for the device user's 'profile' contact.
-                Uri.withAppendedPath(ContactsContract.Profile.CONTENT_URI,
-                        ContactsContract.Contacts.Data.CONTENT_DIRECTORY), ProfileQuery.PROJECTION,
-
-                // Select only email addresses.
-                ContactsContract.Contacts.Data.MIMETYPE +
-                        " = ?", new String[]{ContactsContract.CommonDataKinds.Email
-                .CONTENT_ITEM_TYPE},
-
-                // Show primary email addresses first. Note that there won't be
-                // a primary email address if the user hasn't specified one.
-                ContactsContract.Contacts.Data.IS_PRIMARY + " DESC"
-        );
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> cursorLoader) {
-
-    }
-
-    private interface ProfileQuery {
-        String[] PROJECTION = {
-                ContactsContract.CommonDataKinds.Email.ADDRESS,
-                ContactsContract.CommonDataKinds.Email.IS_PRIMARY,
-        };
-
-        int ADDRESS = 0;
-        int IS_PRIMARY = 1;
     }
 
     private void updatePage(String body) {
