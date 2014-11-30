@@ -3,7 +3,6 @@ package com.example.yaginuma.wikinclient.activities;
 import android.app.Activity;
 
 import android.app.ActionBar;
-import android.app.DownloadManager;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.SearchManager;
@@ -11,10 +10,6 @@ import android.app.SearchableInfo;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.provider.SearchRecentSuggestions;
-import android.text.Html;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,9 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
 import android.webkit.WebView;
-import android.widget.ListView;
 import android.widget.SearchView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -41,21 +34,10 @@ import com.example.yaginuma.wikinclient.api.WikinClient;
 import com.example.yaginuma.wikinclient.fragments.NavigationDrawerFragment;
 import com.example.yaginuma.wikinclient.R;
 import com.example.yaginuma.wikinclient.model.Page;
-import com.example.yaginuma.wikinclient.providers.WikinClientSuggestionProvider;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashMap;
 import java.util.Map;
 
 
@@ -75,6 +57,7 @@ public class MyActivity extends Activity
     private int mEventCount = 0;
     private int mCurrentPos = 0;
     private WikinClient mWikinClient;
+    private boolean mLoadCompleted = false;
 
     private static final String TAG = MyActivity.class.getSimpleName();
 
@@ -171,9 +154,11 @@ public class MyActivity extends Activity
                 startActivity(settingIntent);
                 return true;
             case R.id.action_reload:
+                if (!mLoadCompleted) return true;
                 fetchPageListFromWikin();
                 return true;
             case R.id.action_edit:
+                if (!mLoadCompleted) return true;
                 Intent editIntent = new Intent(this, EditActivity.class);
                 Page page = mWikinClient.getPages().get(this.mCurrentPos);
                 editIntent.putExtra("page", page);
@@ -271,6 +256,7 @@ public class MyActivity extends Activity
                 body = page.getExtractedBody();
                 mBodyHtml.loadDataWithBaseURL(null, body, "text/html", "utf-8", null);
                 mEventCount = mWikinClient.getPageCount();
+                mLoadCompleted = true;
             }
         } catch (JSONException e) {
             Toast.makeText(this, this.getString(R.string.error_unknown_exception), Toast.LENGTH_SHORT).show();
