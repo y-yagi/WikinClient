@@ -99,9 +99,9 @@ public class MyActivity extends Activity
         String body = "" ;
         Page page;
         if (mEventCount > 0 ) {
-            page = mWikinClient.getPages().get(number - 2);
+            page = mWikinClient.getPages().get(number - 1);
             body = page.getExtractedBody();
-            mCurrentPos = number - 2;
+            mCurrentPos = number - 1;
             mTitle = page.getTitle();
         }
         mBodyHtml.loadDataWithBaseURL(null, body, "text/html", "utf-8", null);
