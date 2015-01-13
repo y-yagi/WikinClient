@@ -68,9 +68,7 @@ public class EditActivity extends Activity
 
         Bundle extras = getIntent().getExtras();
         mPage = (Page) extras.getSerializable("page");
-
-        mTitleView = (TextView) findViewById(R.id.title);
-        mTitleView.setText(mPage.getTitle());
+        setTitle(mPage.getTitle());
 
         mBodyView = (EditText) findViewById(R.id.body);
         mBodyView.setText(mPage.getBody());
