@@ -1,10 +1,17 @@
 buildscript {
-    repositories {
-        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+    dependencies {
+        repositories {
+            mavenCentral()
+            maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+        }
+        classpath "com.android.tools.build:gradle:1.0.0"
+        classpath "com.github.jcandksolutions.gradle:android-unit-test:2.1.1"
+        classpath 'org.robolectric:robolectric-gradle-plugin:0.14.+'
     }
 }
 
 apply plugin: 'com.android.application'
+apply plugin: 'robolectric'
 
 android {
     compileSdkVersion 19
@@ -29,4 +36,17 @@ dependencies {
     compile 'com.android.support:support-v4:19.+'
     compile 'com.mcxiaoke.volley:library:1.0.5'
     compile 'com.android.support:appcompat-v7:19.+'
+    androidTestCompile "junit:junit:4.10"
+    androidTestCompile 'org.robolectric:robolectric:2.4'
 }
+
+robolectric {
+    include '**/*Test.class'
+
+    // configure whether failing tests should fail the build
+    ignoreFailures true
+    afterTest { descriptor, result ->
+        println "Executing test for {$descriptor.name} with result: ${result.resultType}"
+    }
+}
+
