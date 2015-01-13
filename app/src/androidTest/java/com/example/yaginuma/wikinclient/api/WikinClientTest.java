@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.example.yaginuma.wikinclient.R;
+import com.example.yaginuma.wikinclient.TestHelper;
 import com.example.yaginuma.wikinclient.model.Page;
 
 import org.json.JSONArray;
@@ -44,9 +45,7 @@ public class WikinClientTest {
 
     public void setUpDummyData() {
         try {
-            String s =
-                "{\"pages\":[{\"id\":3,\"title\":\"test\",\"url\":\"http://localhost:3000/test\",\"body\":\"**テストページ3**\",\"extracted_body\":\"\\u003cp\\u003e\\u003cstrong\\u003eテストページ3\\u003c/strong\\u003e\\u003c/p\\u003e\\n\"},{\"id\":2,\"title\":\"2\",\"url\":\"http://localhost:3000/2\",\"body\":\"2\",\"extracted_body\":\"\\u003cp\\u003e2\\u003c/p\\u003e\\n\"},{\"id\":1,\"title\":\"1\",\"url\":\"http://localhost:3000/1\",\"body\":\"1\",\"extracted_body\":\"\\u003cp\\u003e1\\u003c/p\\u003e\\n\"}],\"results_returned\":3}";
-            JSONObject dummyData = new JSONObject(s);
+            JSONObject dummyData = new JSONObject(TestHelper.getDummyListResponse());
             mWikinClient.parseListResponse(dummyData);
         } catch(Exception e) {
             e.printStackTrace();
