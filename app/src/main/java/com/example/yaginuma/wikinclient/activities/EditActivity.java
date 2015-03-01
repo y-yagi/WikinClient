@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
@@ -180,6 +181,8 @@ public class EditActivity extends Activity
         }
         if (result) {
             Toast.makeText(this, getString(R.string.success_update), Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, MyActivity.class);
+            startActivity(intent);
         } else {
             Toast.makeText(this, getString(R.string.error_input), Toast.LENGTH_SHORT).show();
         }
