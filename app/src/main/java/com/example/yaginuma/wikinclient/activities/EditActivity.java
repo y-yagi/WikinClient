@@ -182,6 +182,7 @@ public class EditActivity extends Activity
         if (result) {
             Toast.makeText(this, getString(R.string.success_update), Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(this, MyActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
         } else {
             Toast.makeText(this, getString(R.string.error_input), Toast.LENGTH_SHORT).show();
