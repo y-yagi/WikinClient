@@ -36,6 +36,7 @@ dependencies {
     compile 'com.android.support:support-v4:19.+'
     compile 'com.mcxiaoke.volley:library:1.0.5'
     compile 'com.android.support:appcompat-v7:19.+'
+    compile 'io.realm:realm-android:0.80.0'
     androidTestCompile "junit:junit:4.10"
     androidTestCompile 'org.robolectric:robolectric:2.4'
 }
