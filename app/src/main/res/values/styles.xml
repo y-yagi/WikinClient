@@ -32,7 +32,6 @@
         <item name="android:editTextBackground">@drawable/wikin_edit_text_holo_light</item>
         <!-- Light.DarkActionBar specific -->
         <item name="android:actionBarWidgetTheme">@style/Theme.Wikin.Widget</item>
-
     </style>
 
     <style name="ActionBar.Solid.Wikin" parent="@android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">
@@ -80,4 +79,7 @@
         <item name="android:dropDownListViewStyle">@style/DropDownListView.Wikin</item>
     </style>
 
+    <style name="ActionBarTitleStyle" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
+        <item name="android:fontFamily">sans-serif-thin</item>
+    </style>
 </resources>
