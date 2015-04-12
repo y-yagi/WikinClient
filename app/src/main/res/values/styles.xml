@@ -36,9 +36,9 @@
     </style>
 
     <style name="ActionBar.Solid.Wikin" parent="@android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">
-        <item name="android:background">@drawable/ab_background_textured_wikin</item>
+        <item name="android:background">@color/main_color</item>
         <item name="android:backgroundStacked">@drawable/ab_stacked_solid_wikin</item>
-        <item name="android:backgroundSplit">@drawable/ab_background_textured_wikin</item>
+        <item name="android:backgroundSplit">@color/main_color</item>
         <item name="android:progressBarStyle">@style/ProgressBar.Wikin</item>
         <item name="android:displayOptions">useLogo|showCustom</item>
     </style>
