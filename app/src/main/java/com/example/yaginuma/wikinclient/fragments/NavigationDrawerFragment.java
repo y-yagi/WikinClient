@@ -99,9 +99,9 @@ public class NavigationDrawerFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (beforeView != null) {
-                    beforeView.setBackgroundColor(getResources().getColor(R.color.list_default));
+                    beforeView.setBackgroundColor(getResources().getColor(R.color.primary_light));
                 }
-                view.setBackgroundColor(getResources().getColor(R.color.list_selected));
+                view.setBackgroundColor(getResources().getColor(R.color.primary_light));
                 beforeView = view;
                 selectItem(position);
             }
