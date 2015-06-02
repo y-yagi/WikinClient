@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
 import android.content.Context;
@@ -34,6 +35,7 @@ import com.example.yaginuma.wikinclient.api.WikinClient;
 import com.example.yaginuma.wikinclient.fragments.NavigationDrawerFragment;
 import com.example.yaginuma.wikinclient.R;
 import com.example.yaginuma.wikinclient.model.Page;
+import com.example.yaginuma.wikinclient.services.ProgressDialogBuilder;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -58,6 +60,7 @@ public class MyActivity extends Activity
     private int mCurrentPos = 0;
     private WikinClient mWikinClient;
     private boolean mLoadCompleted = false;
+    private ProgressDialog mProgressDialog;
 
     private static final String TAG = MyActivity.class.getSimpleName();
 
@@ -212,13 +215,15 @@ public class MyActivity extends Activity
 
     private void fetchPageListFromWikin() {
         String body = "Now Loading...";
-        mBodyHtml.loadDataWithBaseURL(null, body, "text/html", "utf-8", null);
+//        mBodyHtml.loadDataWithBaseURL(null, body, "text/html", "utf-8", null);
 
         if (mWikinClient.getBaseUrl().length() == 0)  {
             String errMsg = getString(R.string.setting_not_completed);
             Toast.makeText(this, errMsg, Toast.LENGTH_SHORT).show();
             return;
         }
+        mProgressDialog = ProgressDialogBuilder.build(this, body);
+        mProgressDialog.show();
 
         RequestQueue mQueue;
         mQueue = Volley.newRequestQueue(this);
@@ -257,8 +262,10 @@ public class MyActivity extends Activity
                 mBodyHtml.loadDataWithBaseURL(null, body, "text/html", "utf-8", null);
                 mEventCount = mWikinClient.getPageCount();
                 mLoadCompleted = true;
+                mProgressDialog.dismiss();
             }
         } catch (JSONException e) {
+            mProgressDialog.dismiss();
             Toast.makeText(this, this.getString(R.string.error_unknown_exception), Toast.LENGTH_SHORT).show();
             Log.e(TAG, "Data parse error");
             e.printStackTrace();
