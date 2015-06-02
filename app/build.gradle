@@ -19,7 +19,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.yaginuma.wikinclient"
-        minSdkVersion 16
+        minSdkVersion 18
         targetSdkVersion 19
         versionCode 1
         versionName "1.0"
