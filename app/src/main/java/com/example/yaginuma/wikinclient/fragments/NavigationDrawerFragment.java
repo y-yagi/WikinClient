@@ -95,14 +95,8 @@ public class NavigationDrawerFragment extends Fragment {
         mDrawerListView = (ListView) inflater.inflate(
                 R.layout.fragment_navigation_drawer, container, false);
         mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            View beforeView = null;
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (beforeView != null) {
-                    beforeView.setBackgroundColor(getResources().getColor(R.color.list_default));
-                }
-                view.setBackgroundColor(getResources().getColor(R.color.list_selected));
-                beforeView = view;
                 selectItem(position);
             }
         });

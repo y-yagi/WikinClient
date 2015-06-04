@@ -3,7 +3,8 @@ language: android
 android:
   components:
     - build-tools-19.1.0
-    - android-19
+    - android-22
+    - extra-android-m2repository
 
 script:
     - ./gradlew -i test
