@@ -11,7 +11,6 @@ buildscript {
 }
 
 apply plugin: 'com.android.application'
-apply plugin: 'robolectric'
 
 android {
     compileSdkVersion 22
@@ -37,17 +36,8 @@ dependencies {
     compile 'com.mcxiaoke.volley:library:1.0.5'
     compile 'com.android.support:appcompat-v7:22.2.0'
     compile 'com.android.support:design:22.2.0'
-    androidTestCompile "junit:junit:4.10"
-    androidTestCompile 'org.robolectric:robolectric:2.4'
-}
-
-robolectric {
-    include '**/*Test.class'
-
-    // configure whether failing tests should fail the build
-    ignoreFailures true
-    afterTest { descriptor, result ->
-        println "Executing test for {$descriptor.name} with result: ${result.resultType}"
-    }
+    testCompile "junit:junit:4.10"
+    testCompile "org.assertj:assertj-core:1.7.0"
+    testCompile "org.robolectric:robolectric:3.0"
 }
 
