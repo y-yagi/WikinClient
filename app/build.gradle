@@ -28,6 +28,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    testOptions {
+        // For UnitTest
+        // @ref: http://tools.android.com/tech-docs/unit-testing-support
+        unitTests.returnDefaultValues = true
+    }
 }
 
 dependencies {
