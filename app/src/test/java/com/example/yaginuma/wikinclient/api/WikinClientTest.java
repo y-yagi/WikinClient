@@ -4,8 +4,10 @@ import android.app.Application;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.example.yaginuma.wikinclient.BuildConfig;
 import com.example.yaginuma.wikinclient.R;
 import com.example.yaginuma.wikinclient.TestHelper;
+import com.example.yaginuma.wikinclient.activities.MyActivity;
 import com.example.yaginuma.wikinclient.model.Page;
 
 import org.json.JSONArray;
@@ -15,7 +17,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
+import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowApplication;
 
@@ -28,14 +32,14 @@ import static org.hamcrest.CoreMatchers.*;
  * Created by yaginuma on 15/01/12.
  */
 
-@Config(emulateSdk = 18)
-@RunWith(RobolectricTestRunner.class)
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class)
 public class WikinClientTest {
     private WikinClient mWikinClient;
 
     @Before
     public void setUp() {
-        Application application = Robolectric.application;
+        Application application = RuntimeEnvironment.application;
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(application);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(application.getString(R.string.pref_wikin_url), "http://example.com").commit();

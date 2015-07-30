@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.example.yaginuma.wikinclient.BuildConfig;
 import com.example.yaginuma.wikinclient.R;
 import com.example.yaginuma.wikinclient.TestHelper;
 
@@ -15,7 +16,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
+import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowWebView;
 
@@ -26,8 +29,8 @@ import static org.hamcrest.CoreMatchers.*;
 /**
  * Created by yaginuma on 15/01/12.
  */
-@Config(emulateSdk = 18)
-@RunWith(RobolectricTestRunner.class)
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class)
 public class MyActivityTest {
     private MyActivity myActivity;
     private ShadowWebView shadowWebView;
@@ -66,7 +69,7 @@ public class MyActivityTest {
         myActivity.onResponse(createDummyData());
 
         WebView webView = (WebView)myActivity.findViewById(R.id.bodyHtml);
-        shadowWebView = Robolectric.shadowOf(webView);
+        shadowWebView = Shadows.shadowOf(webView);
 
         ShadowWebView.LoadDataWithBaseURL loadData = shadowWebView.getLastLoadDataWithBaseURL();
         assertThat("<p><strong>テストページ3</strong></p>", equalTo(loadData.data.trim()));
