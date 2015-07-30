@@ -33,7 +33,7 @@ import static org.hamcrest.CoreMatchers.*;
  */
 
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class)
+@Config(constants = BuildConfig.class, sdk = 21)
 public class WikinClientTest {
     private WikinClient mWikinClient;
 

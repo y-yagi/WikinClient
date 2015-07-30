@@ -30,7 +30,7 @@ import static org.hamcrest.CoreMatchers.*;
  * Created by yaginuma on 15/01/12.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class)
+@Config(constants = BuildConfig.class, sdk = 21)
 public class MyActivityTest {
     private MyActivity myActivity;
     private ShadowWebView shadowWebView;

@@ -33,7 +33,7 @@ import static org.junit.Assert.assertThat;
  * Created by yaginuma on 15/01/12.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class)
+@Config(constants = BuildConfig.class, sdk = 21)
 public class ShowActivityTest {
     private ShowActivty showActivity;
     private ShadowWebView shadowWebView;
