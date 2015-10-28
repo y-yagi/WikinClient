@@ -274,6 +274,7 @@ public class MyActivity extends Activity
 
     @Override
     public void onErrorResponse(VolleyError error) {
+        mProgressDialog.dismiss();
         Toast.makeText(this, this.getString(R.string.error_loading), Toast.LENGTH_SHORT).show();
         Log.e(TAG, "Data load error");
         error.printStackTrace();
