@@ -165,13 +165,6 @@ public class MyActivity extends Activity
                 if (!mLoadCompleted) return true;
                 fetchPageListFromWikin();
                 return true;
-            case R.id.action_edit:
-                if (!mLoadCompleted) return true;
-                Intent editIntent = new Intent(this, EditActivity.class);
-                Page page = mWikinClient.getPages().get(this.mCurrentPos);
-                editIntent.putExtra("page", page);
-                startActivity(editIntent);
-                return true;
             default:
                 return super.onOptionsItemSelected(item);
 

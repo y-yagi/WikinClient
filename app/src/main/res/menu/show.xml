@@ -2,9 +2,4 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.yaginuma.wikinclient.activities.ShowActivty" >
 
-    <item
-        android:id="@+id/action_edit"
-        android:icon="@drawable/ic_action_edit"
-        android:showAsAction="ifRoom"
-        android:title="@string/action_edit"/>
 </menu>
