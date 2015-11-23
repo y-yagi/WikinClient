@@ -5,12 +5,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.webkit.WebView;
 
 import com.example.yaginuma.wikinclient.R;
 import com.example.yaginuma.wikinclient.model.Page;
+import com.melnykov.fab.FloatingActionButton;
 
-public class ShowActivty extends Activity {
+public class ShowActivty extends Activity implements View.OnClickListener {
 
     private Page mPage;
     private WebView mBodyHtml;
@@ -27,6 +29,8 @@ public class ShowActivty extends Activity {
         mBodyHtml = (WebView) findViewById(R.id.bodyHtml);
         mBodyHtml.loadDataWithBaseURL(null, mPage.getExtractedBody(), "text/html", "utf-8", null);
 
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(this);
     }
 
     @Override
@@ -52,5 +56,12 @@ public class ShowActivty extends Activity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View v) {
+        Intent editIntent = new Intent(this, EditActivity.class);
+        editIntent.putExtra("page", mPage);
+        startActivity(editIntent);
     }
 }
