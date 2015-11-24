@@ -9,6 +9,7 @@ import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -36,6 +37,7 @@ import com.example.yaginuma.wikinclient.fragments.NavigationDrawerFragment;
 import com.example.yaginuma.wikinclient.R;
 import com.example.yaginuma.wikinclient.model.Page;
 import com.example.yaginuma.wikinclient.services.ProgressDialogBuilder;
+import com.melnykov.fab.FloatingActionButton;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,7 +46,7 @@ import java.util.Map;
 
 
 public class MyActivity extends Activity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks, Response.Listener<JSONObject>, Response.ErrorListener {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks, Response.Listener<JSONObject>, Response.ErrorListener, View.OnClickListener {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -81,6 +83,9 @@ public class MyActivity extends Activity
             startActivity(settingIntent);
             return ;
         }
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(this);
 
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(
@@ -159,13 +164,6 @@ public class MyActivity extends Activity
             case R.id.action_reload:
                 if (!mLoadCompleted) return true;
                 fetchPageListFromWikin();
-                return true;
-            case R.id.action_edit:
-                if (!mLoadCompleted) return true;
-                Intent editIntent = new Intent(this, EditActivity.class);
-                Page page = mWikinClient.getPages().get(this.mCurrentPos);
-                editIntent.putExtra("page", page);
-                startActivity(editIntent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -278,6 +276,14 @@ public class MyActivity extends Activity
         Toast.makeText(this, this.getString(R.string.error_loading), Toast.LENGTH_SHORT).show();
         Log.e(TAG, "Data load error");
         error.printStackTrace();
+    }
+
+    @Override
+    public void onClick(View v) {
+        Intent editIntent = new Intent(this, EditActivity.class);
+        Page page = mWikinClient.getPages().get(this.mCurrentPos);
+        editIntent.putExtra("page", page);
+        startActivity(editIntent);
     }
 }
 
