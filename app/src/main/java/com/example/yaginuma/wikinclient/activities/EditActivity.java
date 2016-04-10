@@ -135,8 +135,7 @@ public class EditActivity extends Activity {
     }
 
     private void updatePage(String body) {
-        WikinService wikinService= ServiceGenerator.createService(WikinService.class, mWikinClient.getBaseUrl(), mWikinClient.userName, mWikinClient.password);
-        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), "page[body]=" + body);
+        WikinService wikinService= ServiceGenerator.createService(WikinService.class, mWikinClient.baseUrl, mWikinClient.userName, mWikinClient.password);
         Call<ResponseBody> call = wikinService.updatePage(mPage.getId(), body);
         call.enqueue(new Callback<ResponseBody>() {
             @Override

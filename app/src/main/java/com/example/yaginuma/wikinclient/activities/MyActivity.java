@@ -75,7 +75,7 @@ public class MyActivity extends Activity
 
         this.mWikinClient = new WikinClient(this);
 
-        if (this.mWikinClient.getBaseUrl().length() == 0) {
+        if (this.mWikinClient.baseUrl.length() == 0) {
             Intent settingIntent = new Intent(this, SettingsActivity.class);
             startActivity(settingIntent);
             return ;
@@ -212,7 +212,7 @@ public class MyActivity extends Activity
     private void fetchPageListFromWikin() {
         String body = "Now Loading...";
 
-        if (mWikinClient.getBaseUrl().length() == 0)  {
+        if (mWikinClient.baseUrl.length() == 0)  {
             String errMsg = getString(R.string.setting_not_completed);
             Toast.makeText(this, errMsg, Toast.LENGTH_SHORT).show();
             return;
@@ -220,7 +220,7 @@ public class MyActivity extends Activity
         mProgressDialog = ProgressDialogBuilder.build(this, body);
         mProgressDialog.show();
 
-        WikinService wikinService= ServiceGenerator.createService(WikinService.class, mWikinClient.getBaseUrl(), mWikinClient.userName, mWikinClient.password);
+        WikinService wikinService= ServiceGenerator.createService(WikinService.class, mWikinClient.baseUrl, mWikinClient.userName, mWikinClient.password);
         Call<ResponseBody> call = wikinService.getPages();
         call.enqueue(new Callback<ResponseBody>() {
             @Override

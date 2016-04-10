@@ -136,7 +136,7 @@ public class ListActivity extends Activity {
     }
 
     private void searchFromWikin() {
-        WikinService wikinService= ServiceGenerator.createService(WikinService.class, mWikinClient.getBaseUrl(), mWikinClient.userName, mWikinClient.password);
+        WikinService wikinService= ServiceGenerator.createService(WikinService.class, mWikinClient.baseUrl, mWikinClient.userName, mWikinClient.password);
         Call<ResponseBody> call = wikinService.searchPages(searchQuery);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
