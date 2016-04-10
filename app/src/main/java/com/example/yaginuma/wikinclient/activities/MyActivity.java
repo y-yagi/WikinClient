@@ -232,8 +232,8 @@ public class MyActivity extends Activity
                 mProgressDialog.dismiss();
                 if (response.isSuccessful()) {
                     try {
-                        JSONObject responceBody = new JSONObject(response.body().string());
-                        mWikinClient.parseListResponse(responceBody);
+                        JSONObject responseBody = new JSONObject(response.body().string());
+                        mWikinClient.parseListResponse(responseBody);
                     } catch (Exception e) {
                         Toast.makeText(mActivity, mActivity.getString(R.string.error_unknown_exception), Toast.LENGTH_SHORT).show();
                         Log.e(TAG, "Data parse error");

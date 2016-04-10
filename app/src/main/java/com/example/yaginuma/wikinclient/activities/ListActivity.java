@@ -8,7 +8,6 @@ import android.app.SearchManager;
 import android.app.SearchableInfo;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.pdf.PdfDocument;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,36 +15,31 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 import com.example.yaginuma.wikinclient.R;
 import com.example.yaginuma.wikinclient.adapters.PageListAdapter;
 import com.example.yaginuma.wikinclient.api.WikinClient;
 import com.example.yaginuma.wikinclient.model.Page;
+import com.example.yaginuma.wikinclient.services.ServiceGenerator;
+import com.example.yaginuma.wikinclient.services.WikinService;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Map;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-public class ListActivity extends Activity
-        implements Response.Listener<JSONObject>, Response.ErrorListener {
-
+public class ListActivity extends Activity {
     private ListView mListView;
     private GridView mGridView;
     private TextView mHeaderView;
+    private Activity mActivity;
 
     private View mProgressView;
     private WikinClient mWikinClient;
@@ -63,6 +57,7 @@ public class ListActivity extends Activity
         mGridView = (GridView) findViewById(R.id.grid_view);
         mHeaderView = (TextView) findViewById(R.id.list_header);
         mProgressView = findViewById(R.id.list_progress);
+        mActivity = this;
         this.mWikinClient = new WikinClient(this);
 
         Bundle extras = getIntent().getExtras();
@@ -105,9 +100,6 @@ public class ListActivity extends Activity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         return super.onOptionsItemSelected(item);
     }
@@ -144,29 +136,39 @@ public class ListActivity extends Activity
     }
 
     private void searchFromWikin() {
-        RequestQueue mQueue;
-        mQueue = Volley.newRequestQueue(this);
-        mQueue.add(new JsonObjectRequest(Request.Method.GET, mWikinClient.getSearchUrl(searchQuery),
-                null, this, this
-        ) {
+        WikinService wikinService= ServiceGenerator.createService(WikinService.class, mWikinClient.getBaseUrl(), mWikinClient.userName, mWikinClient.password);
+        Call<ResponseBody> call = wikinService.searchPages(searchQuery);
+        call.enqueue(new Callback<ResponseBody>() {
             @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                return mWikinClient.addAuthHeaders(super.getHeaders());
-            };
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                showProgress(false);
+                if (response.isSuccessful()) {
+                    displaySearchResult(response);
+                } else {
+                    Toast.makeText(mActivity, mActivity.getString(R.string.error_unknown_exception), Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "responce is not success");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                showProgress(false);
+                Toast.makeText(mActivity, mActivity.getString(R.string.error_unknown_exception), Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "callback onFailure");
+            }
         });
     }
 
-
-    @Override
-    public void onResponse(JSONObject response) {
+    public void displaySearchResult(Response<ResponseBody> response) {
         PageListAdapter pageListAdapter = new PageListAdapter(this);
         pageListAdapter.clear();
 
         final Context context = this;
         showProgress(false);
         try {
-            mWikinClient.parseListResponse(response);
-        } catch (JSONException e) {
+            JSONObject responseBody = new JSONObject(response.body().string());
+            mWikinClient.parseListResponse(responseBody);
+        } catch (Exception e) {
             Toast.makeText(this, this.getString(R.string.error_unknown_exception), Toast.LENGTH_SHORT).show();
             Log.e(TAG, "Data parse error");
             e.printStackTrace();
@@ -195,13 +197,5 @@ public class ListActivity extends Activity
         } else if (mGridView != null) {
             mGridView.setAdapter(pageListAdapter);
         }
-    }
-
-    @Override
-    public void onErrorResponse(VolleyError error) {
-        showProgress(false);
-        Toast.makeText(this, this.getString(R.string.error_unknown_exception), Toast.LENGTH_SHORT).show();
-        Log.e(TAG, "Data load error");
-        error.printStackTrace();
     }
 }
