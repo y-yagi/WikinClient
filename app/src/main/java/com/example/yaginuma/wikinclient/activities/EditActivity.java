@@ -4,54 +4,41 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.LoaderManager.LoaderCallbacks;
-import android.content.Context;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.AsyncTask;
 
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.provider.ContactsContract;
 import android.text.TextUtils;
-import android.util.Base64;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 import com.example.yaginuma.wikinclient.R;
 import com.example.yaginuma.wikinclient.api.WikinClient;
 import com.example.yaginuma.wikinclient.model.Page;
+import com.example.yaginuma.wikinclient.services.ServiceGenerator;
+import com.example.yaginuma.wikinclient.services.WikinService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.Map;
+
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * A login screen that offers login via email/password.
  */
-public class EditActivity extends Activity
-        implements Response.Listener<JSONObject>, Response.ErrorListener {
-
+public class EditActivity extends Activity {
     // UI references.
     private TextView mTitleView;
     private EditText mBodyView;
@@ -59,6 +46,7 @@ public class EditActivity extends Activity
     private View mEditFormView;
     private Page mPage;
     private WikinClient mWikinClient;
+    private Activity mActivity;
 
     private static final String TAG = MyActivity.class.getSimpleName();
 
@@ -85,6 +73,7 @@ public class EditActivity extends Activity
         mEditFormView = findViewById(R.id.edit_form);
         mProgressView = findViewById(R.id.edit_progress);
         mWikinClient = new WikinClient(this);
+        mActivity = this;
     }
 
     public void attemptUpdate() {
@@ -149,33 +138,37 @@ public class EditActivity extends Activity
     }
 
     private void updatePage(String body) {
-        Map<String, String> jsonParams = new HashMap<String, String>();
-        jsonParams.put("body", body);
-        String url = mWikinClient.getUpdateUrl() + mPage.getId() + ".json";
-        final Context mContext = this;
-
-        RequestQueue mQueue;
-        mQueue = Volley.newRequestQueue(this);
-        JsonObjectRequest myRequest = new JsonObjectRequest(
-                Request.Method.PUT, url, new JSONObject(jsonParams), this, this
-        ) {
+        WikinService wikinService= ServiceGenerator.createService(WikinService.class, mWikinClient.getBaseUrl(), mWikinClient.userName, mWikinClient.password);
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), "page[body]=" + body);
+        Call<ResponseBody> call = wikinService.updatePage(mPage.getId(), body);
+        call.enqueue(new Callback<ResponseBody>() {
             @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = mWikinClient.addAuthHeaders(super.getHeaders());
-                headers.put("Content-Type", "application/json; charset=utf-8");
-                return headers;
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                showProgress(false);
+                if (response.isSuccessful()) {
+                    displaySearchResult(response);
+                } else {
+                    Toast.makeText(mActivity, mActivity.getString(R.string.error_unknown_exception), Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "responce is not success");
+                }
             }
-        };
-        mQueue.add(myRequest);
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                showProgress(false);
+                Toast.makeText(mActivity, mActivity.getString(R.string.error_unknown_exception), Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "callback onFailure");
+            }
+        });
     }
 
-    @Override
-    public void onResponse(JSONObject response) {
+    private void displaySearchResult(Response<ResponseBody> response) {
         showProgress(false);
         boolean result = true;
         try {
-            result = mWikinClient.verificationResponse(response);
-        } catch (JSONException e) {
+            JSONObject responseBody = new JSONObject(response.body().string());
+            result = mWikinClient.verificationResponse(responseBody);
+        } catch (Exception e) {
             e.printStackTrace();
             Log.e(TAG, "Data parse error");
         }
@@ -187,12 +180,6 @@ public class EditActivity extends Activity
         } else {
             Toast.makeText(this, getString(R.string.error_input), Toast.LENGTH_SHORT).show();
         }
-    }
-
-    @Override
-    public void onErrorResponse(VolleyError error) {
-        Toast.makeText(this, getString(R.string.error_unknown_exception), Toast.LENGTH_SHORT).show();
-        showProgress(false);
     }
 }
 
