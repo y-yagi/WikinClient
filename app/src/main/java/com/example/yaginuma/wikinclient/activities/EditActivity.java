@@ -23,10 +23,7 @@ import com.example.yaginuma.wikinclient.model.Page;
 import com.example.yaginuma.wikinclient.services.ServiceGenerator;
 import com.example.yaginuma.wikinclient.services.WikinService;
 
-import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.HashMap;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;

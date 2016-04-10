@@ -22,9 +22,6 @@ import android.webkit.WebView;
 import android.widget.SearchView;
 import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.example.yaginuma.wikinclient.api.WikinClient;
 import com.example.yaginuma.wikinclient.fragments.NavigationDrawerFragment;
 import com.example.yaginuma.wikinclient.R;
@@ -34,7 +31,6 @@ import com.example.yaginuma.wikinclient.services.ServiceGenerator;
 import com.example.yaginuma.wikinclient.services.WikinService;
 import com.melnykov.fab.FloatingActionButton;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
