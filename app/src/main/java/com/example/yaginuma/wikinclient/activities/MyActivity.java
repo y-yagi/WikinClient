@@ -236,6 +236,7 @@ public class MyActivity extends Activity
                         e.printStackTrace();
                         return;
                     }
+                    mNavigationDrawerFragment.setMenuList(mWikinClient.getMenu());
                     Page page = mWikinClient.getPages().get(0);
                     mTitle = page.getTitle();
                     setTitle(page.getTitle());
