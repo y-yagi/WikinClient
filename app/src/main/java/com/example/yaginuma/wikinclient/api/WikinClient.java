@@ -44,14 +44,16 @@ public class WikinClient {
     private static final String SEARTH_PATH = "/pages/search.json?query=";
     private static final String TAG = WikinClient.class.getSimpleName();
     public static  final int TIMEOUT = 7000;  // 7 seconds. It's too long. But, time it takes to start up the heroku.
+    public String userName;
+    public String password;
 
     public WikinClient(Context context) {
         this.mContext = context;
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
 
         this.mBaseUrl = sharedPreferences.getString(mContext.getString(R.string.pref_wikin_url), "");
-        String userName = sharedPreferences.getString(mContext.getString(R.string.pref_wikin_auth_user_name), "");
-        String password = sharedPreferences.getString(mContext.getString(R.string.pref_wikin_auth_password), "");
+        userName = sharedPreferences.getString(mContext.getString(R.string.pref_wikin_auth_user_name), "");
+        password = sharedPreferences.getString(mContext.getString(R.string.pref_wikin_auth_password), "");
         this.mEncodedAuth = Base64.encodeToString((userName + ":" + password).getBytes(), Base64.DEFAULT);
         this.mPages = new ArrayList<Page>();
     }

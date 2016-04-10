@@ -9,7 +9,6 @@ import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,30 +22,30 @@ import android.webkit.WebView;
 import android.widget.SearchView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 import com.example.yaginuma.wikinclient.api.WikinClient;
 import com.example.yaginuma.wikinclient.fragments.NavigationDrawerFragment;
 import com.example.yaginuma.wikinclient.R;
 import com.example.yaginuma.wikinclient.model.Page;
 import com.example.yaginuma.wikinclient.services.ProgressDialogBuilder;
+import com.example.yaginuma.wikinclient.services.ServiceGenerator;
+import com.example.yaginuma.wikinclient.services.WikinService;
 import com.melnykov.fab.FloatingActionButton;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Map;
+import java.util.List;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
 
 
 public class MyActivity extends Activity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks, Response.Listener<JSONObject>, Response.ErrorListener, View.OnClickListener {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks, View.OnClickListener {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -63,6 +62,8 @@ public class MyActivity extends Activity
     private WikinClient mWikinClient;
     private boolean mLoadCompleted = false;
     private ProgressDialog mProgressDialog;
+    private List<Page> mPages;
+    private Activity mActivity;
 
     private static final String TAG = MyActivity.class.getSimpleName();
 
@@ -84,6 +85,7 @@ public class MyActivity extends Activity
             return ;
         }
 
+        mActivity = this;
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(this);
 
@@ -213,7 +215,6 @@ public class MyActivity extends Activity
 
     private void fetchPageListFromWikin() {
         String body = "Now Loading...";
-//        mBodyHtml.loadDataWithBaseURL(null, body, "text/html", "utf-8", null);
 
         if (mWikinClient.getBaseUrl().length() == 0)  {
             String errMsg = getString(R.string.setting_not_completed);
@@ -223,20 +224,42 @@ public class MyActivity extends Activity
         mProgressDialog = ProgressDialogBuilder.build(this, body);
         mProgressDialog.show();
 
-        RequestQueue mQueue;
-        mQueue = Volley.newRequestQueue(this);
-        JsonObjectRequest request =  new JsonObjectRequest(Request.Method.GET, mWikinClient.getListUrl(),
-                null, this, this
-        ){
+        WikinService wikinService= ServiceGenerator.createService(WikinService.class, mWikinClient.getBaseUrl(), mWikinClient.userName, mWikinClient.password);
+        Call<ResponseBody> call = wikinService.getPages();
+        call.enqueue(new Callback<ResponseBody>() {
             @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                return mWikinClient.addAuthHeaders(super.getHeaders());
-            };
-        };
-        RetryPolicy policy = new DefaultRetryPolicy(WikinClient.TIMEOUT,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        request.setRetryPolicy(policy);
-        mQueue.add(request);
+            public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
+                mProgressDialog.dismiss();
+                if (response.isSuccessful()) {
+                    try {
+                        JSONObject responceBody = new JSONObject(response.body().string());
+                        mWikinClient.parseListResponse(responceBody);
+                    } catch (Exception e) {
+                        Toast.makeText(mActivity, mActivity.getString(R.string.error_unknown_exception), Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "Data parse error");
+                        e.printStackTrace();
+                        return;
+                    }
+                    Page page = mWikinClient.getPages().get(0);
+                    mTitle = page.getTitle();
+                    setTitle(page.getTitle());
+                    String body = page.getExtractedBody();
+                    mBodyHtml.loadDataWithBaseURL(null, body, "text/html", "utf-8", null);
+                    mEventCount = mWikinClient.getPageCount();
+                    mLoadCompleted = true;
+                } else {
+                    Toast.makeText(mActivity, mActivity.getString(R.string.error_unknown_exception), Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "responce is not success");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                mProgressDialog.dismiss();
+                Toast.makeText(mActivity, mActivity.getString(R.string.error_unknown_exception), Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "callback onFailure");
+            }
+        });
     }
 
     @Override
@@ -244,38 +267,6 @@ public class MyActivity extends Activity
         super.onResume();
         this.mCurrentPos = 0;
         fetchPageListFromWikin();
-    }
-
-    @Override
-    public void onResponse(JSONObject response) {
-        try {
-            mWikinClient.parseListResponse(response);
-            mNavigationDrawerFragment.setMenuList(mWikinClient.getMenu());
-            String body = "";
-            if (mWikinClient.getPageCount() > 0 ) {
-                Page page = mWikinClient.getPages().get(0);
-                mTitle = page.getTitle();
-                setTitle(page.getTitle());
-                body = page.getExtractedBody();
-                mBodyHtml.loadDataWithBaseURL(null, body, "text/html", "utf-8", null);
-                mEventCount = mWikinClient.getPageCount();
-                mLoadCompleted = true;
-                mProgressDialog.dismiss();
-            }
-        } catch (JSONException e) {
-            mProgressDialog.dismiss();
-            Toast.makeText(this, this.getString(R.string.error_unknown_exception), Toast.LENGTH_SHORT).show();
-            Log.e(TAG, "Data parse error");
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void onErrorResponse(VolleyError error) {
-        mProgressDialog.dismiss();
-        Toast.makeText(this, this.getString(R.string.error_loading), Toast.LENGTH_SHORT).show();
-        Log.e(TAG, "Data load error");
-        error.printStackTrace();
     }
 
     @Override
