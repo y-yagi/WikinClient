@@ -38,6 +38,7 @@ import java.util.List;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class MyActivity extends Activity
@@ -224,26 +225,10 @@ public class MyActivity extends Activity
         Call<ResponseBody> call = wikinService.getPages();
         call.enqueue(new Callback<ResponseBody>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 mProgressDialog.dismiss();
                 if (response.isSuccessful()) {
-                    try {
-                        JSONObject responseBody = new JSONObject(response.body().string());
-                        mWikinClient.parseListResponse(responseBody);
-                    } catch (Exception e) {
-                        Toast.makeText(mActivity, mActivity.getString(R.string.error_unknown_exception), Toast.LENGTH_SHORT).show();
-                        Log.e(TAG, "Data parse error");
-                        e.printStackTrace();
-                        return;
-                    }
-                    mNavigationDrawerFragment.setMenuList(mWikinClient.getMenu());
-                    Page page = mWikinClient.getPages().get(0);
-                    mTitle = page.getTitle();
-                    setTitle(page.getTitle());
-                    String body = page.getExtractedBody();
-                    mBodyHtml.loadDataWithBaseURL(null, body, "text/html", "utf-8", null);
-                    mEventCount = mWikinClient.getPageCount();
-                    mLoadCompleted = true;
+                    displayPageList(response);
                 } else {
                     Toast.makeText(mActivity, mActivity.getString(R.string.error_unknown_exception), Toast.LENGTH_SHORT).show();
                     Log.e(TAG, "responce is not success");
@@ -257,6 +242,26 @@ public class MyActivity extends Activity
                 Log.e(TAG, "callback onFailure");
             }
         });
+    }
+
+    protected  void displayPageList(Response<ResponseBody> response) {
+        try {
+            JSONObject jsonObject = new JSONObject(response.body().string());
+            mWikinClient.parseListResponse(jsonObject);
+        } catch (Exception e) {
+            Toast.makeText(mActivity, mActivity.getString(R.string.error_unknown_exception), Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Data parse error");
+            e.printStackTrace();
+            return;
+        }
+        mNavigationDrawerFragment.setMenuList(mWikinClient.getMenu());
+        Page page = mWikinClient.getPages().get(0);
+        mTitle = page.getTitle();
+        setTitle(page.getTitle());
+        String body = page.getExtractedBody();
+        mBodyHtml.loadDataWithBaseURL(null, body, "text/html", "utf-8", null);
+        mEventCount = mWikinClient.getPageCount();
+        mLoadCompleted = true;
     }
 
     @Override

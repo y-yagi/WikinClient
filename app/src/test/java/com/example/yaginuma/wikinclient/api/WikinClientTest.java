@@ -57,27 +57,6 @@ public class WikinClientTest {
     }
 
     @Test
-    public void testGetBaseUrl() {
-        assertThat("http://example.com", equalTo(mWikinClient.getBaseUrl()));
-    }
-
-    @Test
-    public void testGetListUrl() {
-        assertThat("http://example.com/pages.json?recent_pages=true", equalTo(mWikinClient.getListUrl()));
-    }
-
-    @Test
-    public void testGetUpdateUrl() {
-        assertThat("http://example.com/pages/", equalTo(mWikinClient.getUpdateUrl()));
-    }
-
-    @Test
-    public void testSearchUrl() {
-        assertThat("http://example.com/pages/search.json?query=%E3%83%86%E3%82%B9%E3%83%88",
-                equalTo(mWikinClient.getSearchUrl("テスト")));
-    }
-
-    @Test
     public void testGetPageCount() {
         setUpDummyData();
         assertThat(3, equalTo(mWikinClient.getPageCount()));

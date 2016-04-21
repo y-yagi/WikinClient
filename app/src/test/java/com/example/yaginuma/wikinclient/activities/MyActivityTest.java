@@ -22,6 +22,10 @@ import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowWebView;
 
+import okhttp3.MediaType;
+import okhttp3.ResponseBody;
+import retrofit2.Response;
+
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.CoreMatchers.*;
 
@@ -48,25 +52,27 @@ public class MyActivityTest {
         editor.putString(settingActivity.getString(R.string.pref_wikin_url), "http://example.com").commit();
     }
 
-    public JSONObject createDummyData() {
-        JSONObject dummyData = null;
+    public Response<ResponseBody> dummyResponse() {
+        Response<ResponseBody> response = null;
         try {
-            dummyData = new JSONObject(TestHelper.getDummyListResponse());
+            MediaType type = MediaType.parse("Content-Type: application/json; charset=utf-8");
+            ResponseBody responseBody = ResponseBody.create(type, TestHelper.getDummyListResponse());
+            response = Response.success(responseBody);
         } catch(Exception e) {
             e.printStackTrace();
         }
-        return dummyData;
+        return response;
     }
 
     @Test
     public void testDisplayTitle() throws Exception {
-        myActivity.onResponse(createDummyData());
+        myActivity.displayPageList(dummyResponse());
         assertThat("test", equalTo(myActivity.getTitle()));
     }
 
     @Test
     public void testDisplayWebView() throws Exception {
-        myActivity.onResponse(createDummyData());
+        myActivity.displayPageList(dummyResponse());
 
         WebView webView = (WebView)myActivity.findViewById(R.id.bodyHtml);
         shadowWebView = Shadows.shadowOf(webView);
