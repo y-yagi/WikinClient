@@ -4,15 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Base64;
-import android.util.Log;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 import com.example.yaginuma.wikinclient.R;
 import com.example.yaginuma.wikinclient.model.Page;
 
@@ -20,11 +12,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,48 +21,26 @@ import java.util.Map;
  */
 public class WikinClient {
     private Context mContext;
-    private String mBaseUrl;
     private String mEncodedAuth;
 
     private int mPageCount;
     private String[] mMenu;
     private ArrayList<Page> mPages;
 
-    private static final String LIST_PATH = "/pages.json?recent_pages=true";
-    private static final String UPDATE_PATH = "/pages/";
-    private static final String SEARTH_PATH = "/pages/search.json?query=";
     private static final String TAG = WikinClient.class.getSimpleName();
-    public static  final int TIMEOUT = 7000;  // 7 seconds. It's too long. But, time it takes to start up the heroku.
+    public String baseUrl;
+    public String userName;
+    public String password;
 
     public WikinClient(Context context) {
         this.mContext = context;
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
 
-        this.mBaseUrl = sharedPreferences.getString(mContext.getString(R.string.pref_wikin_url), "");
-        String userName = sharedPreferences.getString(mContext.getString(R.string.pref_wikin_auth_user_name), "");
-        String password = sharedPreferences.getString(mContext.getString(R.string.pref_wikin_auth_password), "");
+        this.baseUrl = sharedPreferences.getString(mContext.getString(R.string.pref_wikin_url), "");
+        userName = sharedPreferences.getString(mContext.getString(R.string.pref_wikin_auth_user_name), "");
+        password = sharedPreferences.getString(mContext.getString(R.string.pref_wikin_auth_password), "");
         this.mEncodedAuth = Base64.encodeToString((userName + ":" + password).getBytes(), Base64.DEFAULT);
         this.mPages = new ArrayList<Page>();
-    }
-
-    public String getBaseUrl() { return this.mBaseUrl; }
-
-    public String getListUrl() {
-        return this.mBaseUrl + LIST_PATH;
-    }
-
-    public String getUpdateUrl() {
-        return this.mBaseUrl + UPDATE_PATH;
-    }
-
-    public String getSearchUrl(String query) {
-        String encodedQuery = "";
-        try {
-            encodedQuery = URLEncoder.encode(query, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return this.mBaseUrl + SEARTH_PATH + encodedQuery;
     }
 
     public void parseListResponse(JSONObject response) throws JSONException {
