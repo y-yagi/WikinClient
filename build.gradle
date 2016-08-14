@@ -1,5 +1,20 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
+apply plugin: 'com.github.ben-manes.versions'
+
+dependencyUpdates.resolutionStrategy = {
+    componentSelection { rules ->
+        rules.all { ComponentSelection selection ->
+            boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
+                selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
+            }
+            if (rejected) {
+                selection.reject('Release candidate')
+            }
+        }
+    }
+}
+
 buildscript {
     repositories {
         jcenter()
@@ -11,6 +26,7 @@ buildscript {
         classpath 'com.android.tools.build:gradle:2.1.2'
         classpath "com.github.jcandksolutions.gradle:android-unit-test:2.1.1"
         classpath 'org.robolectric:robolectric-gradle-plugin:0.14.1'
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.13.0'
     }
 }
 
