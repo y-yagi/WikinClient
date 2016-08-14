@@ -240,6 +240,7 @@ public class MyActivity extends Activity
                 mProgressDialog.dismiss();
                 Toast.makeText(mActivity, mActivity.getString(R.string.error_unknown_exception), Toast.LENGTH_SHORT).show();
                 Log.e(TAG, "callback onFailure");
+                Log.e(TAG, t.getMessage());
             }
         });
     }
