@@ -5,7 +5,7 @@ dependencies:
 
 test:
   override:
-    # - ./gradlew -i test
+    - ./gradlew -i test
     - ./gradlew dependencyUpdates -Drevision=release -DoutputFormatter=json
 
 general:
