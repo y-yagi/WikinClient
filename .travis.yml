@@ -6,5 +6,9 @@ android:
     - android-23
     - extra-android-m2repository
 
+before_install:
+  - android-update-sdk --accept-licenses='android-sdk-license-.+' --components=tools
+  - android-update-sdk --accept-licenses='android-sdk-license-.+' --components=build-tools-23.0.3
+
 script:
     - ./gradlew -i test
