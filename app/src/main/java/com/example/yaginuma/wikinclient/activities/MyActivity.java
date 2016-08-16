@@ -212,8 +212,9 @@ public class MyActivity extends Activity
 
     private void fetchPageListFromWikin() {
         String body = "Now Loading...";
+        WikinService wikinService;
 
-        if (mWikinClient.baseUrl.length() == 0)  {
+        if (mWikinClient.baseUrl.length() == 0) {
             String errMsg = getString(R.string.setting_not_completed);
             Toast.makeText(this, errMsg, Toast.LENGTH_SHORT).show();
             return;
@@ -221,7 +222,16 @@ public class MyActivity extends Activity
         mProgressDialog = ProgressDialogBuilder.build(this, body);
         mProgressDialog.show();
 
-        WikinService wikinService= ServiceGenerator.createService(WikinService.class, mWikinClient.baseUrl, mWikinClient.userName, mWikinClient.password);
+        try {
+            wikinService = ServiceGenerator.createService(WikinService.class, mWikinClient.baseUrl, mWikinClient.userName, mWikinClient.password);
+        } catch(Exception e) {
+            Toast.makeText(mActivity, mActivity.getString(R.string.error_loading), Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "create service error");
+            e.printStackTrace();
+            mProgressDialog.dismiss();
+            return;
+        }
+
         Call<ResponseBody> call = wikinService.getPages();
         call.enqueue(new Callback<ResponseBody>() {
             @Override
@@ -240,6 +250,7 @@ public class MyActivity extends Activity
                 mProgressDialog.dismiss();
                 Toast.makeText(mActivity, mActivity.getString(R.string.error_unknown_exception), Toast.LENGTH_SHORT).show();
                 Log.e(TAG, "callback onFailure");
+                Log.e(TAG, t.getMessage());
             }
         });
     }
