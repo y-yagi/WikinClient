@@ -35,7 +35,7 @@ dependencies {
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
     compile 'com.facebook.stetho:stetho:1.4.2'
     testCompile "junit:junit:4.12"
-    testCompile "org.assertj:assertj-core:3.6.1"
+    testCompile "org.assertj:assertj-core:3.6.2"
     testCompile "org.robolectric:robolectric:3.2.2"
 }
 
