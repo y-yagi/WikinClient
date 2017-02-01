@@ -35,3 +35,7 @@ allprojects {
         jcenter()
     }
 }
+
+project.ext {
+    support_lib_version = "25.1.1"
+}
