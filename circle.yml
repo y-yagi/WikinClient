@@ -1,6 +1,6 @@
 machine:
   java:
-    version: openjdk8
+    version: oraclejdk8
 
 dependencies:
   pre:
@@ -9,7 +9,6 @@ dependencies:
 
 test:
   override:
-    - ./gradlew -i test
     - ./gradlew dependencyUpdates -Drevision=release -DoutputFormatter=json
 
 general:
