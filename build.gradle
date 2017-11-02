@@ -17,13 +17,14 @@ dependencyUpdates.resolutionStrategy = {
 
 buildscript {
     repositories {
+        google()
         jcenter()
         mavenCentral()
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'com.android.tools.build:gradle:3.0.0'
         classpath "com.github.jcandksolutions.gradle:android-unit-test:2.1.1"
         classpath 'org.robolectric:robolectric-gradle-plugin:1.1.0'
         classpath 'com.github.ben-manes:gradle-versions-plugin:0.15.0'
@@ -32,6 +33,7 @@ buildscript {
 
 allprojects {
     repositories {
+        google()
         jcenter()
     }
 }
